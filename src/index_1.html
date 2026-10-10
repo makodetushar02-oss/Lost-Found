@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lost &amp; Found</title>
+<style>
+  :root { --bg:#f5f7fb; --card:#fff; --ink:#1c2333; --muted:#667085; --brand:#3d5afe; --ok:#12a150; --bad:#d92d20; --line:#e4e7ec; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background:var(--bg); color:var(--ink); }
+  header { background:var(--brand); color:#fff; padding:18px 20px; }
+  header h1 { margin:0; font-size:1.3rem; }
+  header p { margin:4px 0 0; opacity:.85; font-size:.9rem; }
+  nav { display:flex; flex-wrap:wrap; gap:6px; padding:12px 16px; background:var(--card); border-bottom:1px solid var(--line); position:sticky; top:0; }
+  nav button { border:0; background:transparent; padding:8px 14px; border-radius:8px; font-size:.95rem; cursor:pointer; color:var(--muted); }
+  nav button.active { background:var(--brand); color:#fff; }
+  main { max-width:860px; margin:20px auto; padding:0 16px 60px; }
+  section { display:none; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px; }
+  section.active { display:block; }
+  h2 { margin-top:0; }
+  label { display:block; margin:12px 0 4px; font-size:.85rem; color:var(--muted); }
+  input, select, textarea { width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; font:inherit; background:#fff; }
+  textarea { min-height:80px; resize:vertical; }
+  .row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  @media (max-width:560px){ .row { grid-template-columns:1fr; } }
+  .btn { margin-top:16px; background:var(--brand); color:#fff; border:0; padding:10px 18px; border-radius:8px; font:inherit; cursor:pointer; }
+  .btn.ok { background:var(--ok); } .btn.bad { background:var(--bad); }
+  .btn.small { margin:0; padding:6px 12px; font-size:.85rem; }
+  .cards { display:grid; gap:12px; margin-top:14px; }
+  .card { border:1px solid var(--line); border-radius:10px; padding:14px; }
+  .card h3 { margin:0 0 6px; font-size:1.05rem; }
+  .meta { color:var(--muted); font-size:.88rem; line-height:1.6; }
+  .tag { display:inline-block; padding:2px 10px; border-radius:99px; font-size:.78rem; background:#eef1ff; color:var(--brand); }
+  .tag.Approved { background:#e6f6ec; color:var(--ok); } .tag.Rejected { background:#fdecea; color:var(--bad); } .tag.Pending { background:#fff4e0; color:#b54708; }
+  .toolbar { display:flex; gap:10px; flex-wrap:wrap; }
+  .toolbar > * { flex:1; min-width:160px; }
+  #toast { position:fixed; left:50%; bottom:24px; transform:translateX(-50%); background:#101828; color:#fff; padding:12px 18px; border-radius:10px; opacity:0; pointer-events:none; transition:opacity .25s; max-width:90%; }
+  #toast.show { opacity:1; } #toast.err { background:var(--bad); }
+  .empty { color:var(--muted); padding:20px 0; text-align:center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Lost &amp; Found Platform</h1>
+  <p>Report lost items, browse found items and claim what is yours.</p>
+</header>
+
+<nav id="nav">
+  <button data-tab="register" class="active">Register</button>
+  <button data-tab="report">Report item</button>
+  <button data-tab="browse">Browse items</button>
+  <button data-tab="claim">Claim item</button>
+  <button data-tab="admin">Admin</button>
+</nav>
+
+<main>
+  <!-- 1. REGISTER -->
+  <section id="tab-register" class="active">
+    <h2>User registration</h2>
+    <form id="registerForm">
+      <label>Full name</label><input name="name" required>
+      <div class="row">
+        <div><label>Phone number</label><input name="phNo" required></div>
+        <div><label>Email</label><input name="email" type="email" required></div>
+      </div>
+      <button class="btn" type="submit">Register</button>
+    </form>
+    <p class="meta" id="myId"></p>
+  </section>
+
+  <!-- 2. REPORT -->
+  <section id="tab-report">
+    <h2>Report an item</h2>
+    <form id="reportForm">
+      <div class="row">
+        <div><label>I want to report a</label>
+          <select name="type"><option value="LOST_ITEM">Lost item</option><option value="FOUND_ITEM">Found item</option></select></div>
+        <div><label>Your user ID</label><input name="userId" class="uid" type="number" required></div>
+      </div>
+      <label>Item name</label><input name="itemName" required>
+      <label>Description / identifying details</label><textarea name="description"></textarea>
+      <div class="row">
+        <div><label>Colour</label><input name="color"></div>
+        <div><label>Category</label><input name="category" placeholder="Phone, Wallet, Keys..."></div>
+      </div>
+      <label>Location</label><input name="location">
+      <button class="btn" type="submit">Submit report</button>
+    </form>
+  </section>
+
+  <!-- 3. BROWSE -->
+  <section id="tab-browse">
+    <h2>Browse items</h2>
+    <div class="toolbar">
+      <select id="browseType"><option value="FOUND_ITEM">Found items</option><option value="LOST_ITEM">Lost items</option></select>
+      <input id="browseSearch" placeholder="Search by name, colour, category, location...">
+    </div>
+    <div id="browseList" class="cards"></div>
+  </section>
+
+  <!-- 4. CLAIM -->
+  <section id="tab-claim">
+    <h2>Claim a lost item</h2>
+    <form id="claimForm">
+      <label>Your user ID</label><input name="userId" class="uid" type="number" required>
+      <label>Item name</label><input name="itemName" required>
+      <label>Proof of ownership</label><textarea name="proof" required></textarea>
+      <label>Location where the item was lost</label><input name="location">
+      <button class="btn" type="submit">Submit claim</button>
+    </form>
+  </section>
+
+  <!-- 5. ADMIN -->
+  <section id="tab-admin">
+    <h2>Admin panel</h2>
+    <div class="toolbar">
+      <input id="adminPw" type="password" placeholder="Admin password">
+      <button class="btn small" id="loadClaims" type="button">Load claims</button>
+    </div>
+    <div id="claimList" class="cards"></div>
+  </section>
+</main>
+
+<div id="toast"></div>
+
+<script>
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+// Escape text before putting it into HTML (stops users injecting scripts).
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function toast(msg, isErr = false) {
+  const t = $('#toast');
+  t.textContent = msg; t.className = 'show' + (isErr ? ' err' : '');
+  setTimeout(() => t.className = '', 3200);
+}
+
+// Sends a request to the Java WebServer and returns the JSON answer.
+async function api(path, options = {}) {
+  const res = await fetch(path, options);
+  let data = {};
+  try { data = await res.json(); } catch (e) {}
+  if (!res.ok) throw new Error(data.error || 'Something went wrong');
+  return data;
+}
+const post = (path, obj, headers = {}) => api(path, { method: 'POST', body: new URLSearchParams(obj), headers });
+
+// ----- tabs -----
+$$('#nav button').forEach(b => b.addEventListener('click', () => {
+  $$('#nav button').forEach(x => x.classList.toggle('active', x === b));
+  $$('main section').forEach(s => s.classList.toggle('active', s.id === 'tab-' + b.dataset.tab));
+  if (b.dataset.tab === 'browse') loadItems();
+}));
+
+// ----- remember the user's ID so they don't retype it -----
+function setUid(id) {
+  try { localStorage.setItem('lfUserId', id); } catch (e) {}
+  $$('.uid').forEach(i => i.value = id);
+  $('#myId').textContent = 'Your user ID is ' + id + ' (it is filled in automatically on other pages).';
+}
+try { const saved = localStorage.getItem('lfUserId'); if (saved) setUid(saved); } catch (e) {}
+
+// ----- register -----
+$('#registerForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    const r = await post('/api/register', Object.fromEntries(new FormData(e.target)));
+    setUid(r.userId); toast('Registered! Your user ID is ' + r.userId); e.target.reset();
+  } catch (err) { toast(err.message, true); }
+});
+
+// ----- report item -----
+$('#reportForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    await post('/api/items', Object.fromEntries(new FormData(e.target)));
+    toast('Item reported successfully'); e.target.reset();
+    const saved = localStorage.getItem('lfUserId'); if (saved) setUid(saved);
+  } catch (err) { toast(err.message, true); }
+});
+
+// ----- browse -----
+let items = [];
+async function loadItems() {
+  try {
+    items = await api('/api/items?type=' + $('#browseType').value);
+    renderItems();
+  } catch (err) { toast(err.message, true); }
+}
+function renderItems() {
+  const q = $('#browseSearch').value.toLowerCase();
+  const shown = items.filter(i => [i.itemName, i.color, i.category, i.location, i.description].join(' ').toLowerCase().includes(q));
+  $('#browseList').innerHTML = shown.length ? shown.map(i => `
+    <div class="card">
+      <h3>${esc(i.itemName)} <span class="tag">${esc(i.category || 'Item')}</span></h3>
+      <div class="meta">Colour: ${esc(i.color || '-')} &nbsp;|&nbsp; Location: ${esc(i.location || '-')}<br>${esc(i.description)}</div>
+    </div>`).join('') : '<div class="empty">No items found.</div>';
+}
+$('#browseType').addEventListener('change', loadItems);
+$('#browseSearch').addEventListener('input', renderItems);
+
+// ----- claim -----
+$('#claimForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  try {
+    await post('/api/claims', Object.fromEntries(new FormData(e.target)));
+    toast('Claim submitted. Status: Pending'); e.target.reset();
+    const saved = localStorage.getItem('lfUserId'); if (saved) setUid(saved);
+  } catch (err) { toast(err.message, true); }
+});
+
+// ----- admin -----
+async function loadClaims() {
+  try {
+    const list = await api('/api/claims', { headers: { 'X-Admin-Password': $('#adminPw').value } });
+    $('#claimList').innerHTML = list.length ? list.map(c => `
+      <div class="card">
+        <h3>#${c.claimId} ${esc(c.itemName)} <span class="tag ${esc(c.status)}">${esc(c.status)}</span></h3>
+        <div class="meta">User ID: ${c.userId} &nbsp;|&nbsp; Lost at: ${esc(c.location || '-')}<br>Proof: ${esc(c.proof)}</div>
+        ${c.status === 'Pending' ? `<p><button class="btn ok small" data-id="${c.claimId}" data-s="Approved">Approve</button>
+          <button class="btn bad small" data-id="${c.claimId}" data-s="Rejected">Reject</button></p>` : ''}
+      </div>`).join('') : '<div class="empty">No claims yet.</div>';
+  } catch (err) { $('#claimList').innerHTML = ''; toast(err.message, true); }
+}
+$('#loadClaims').addEventListener('click', loadClaims);
+$('#claimList').addEventListener('click', async e => {
+  const b = e.target.closest('button[data-id]');
+  if (!b) return;
+  try {
+    await post('/api/claims/update', { claimId: b.dataset.id, status: b.dataset.s }, { 'X-Admin-Password': $('#adminPw').value });
+    toast('Claim ' + b.dataset.s.toLowerCase()); loadClaims();
+  } catch (err) { toast(err.message, true); }
+});
+</script>
+</body>
+</html>
