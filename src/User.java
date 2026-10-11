@@ -1,61 +1,35 @@
 public class User {
-    private int userID;
+    private int userId;
     private String userName;
-    private String role;
+    private String phNo;
     private String email;
-    private String phone;
+    private String role;
 
-    public User(int userID, String userName, String role, String email, String phone) {
-        this.userID = userID;
+    public User(int userId, String userName, String phNo, String email, String role) {
+        this.userId = userId;
         this.userName = userName;
-        this.role= role;
+        this.phNo = phNo;
         this.email = email;
-        this.phone = phone;
-    }
-    public User(String userName, String role, String email, String phone) {
-        this.userName = userName;
-        this.role= role;
-        this.email = email;
-        this.phone = phone;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public int getUserID() {
-        return userID;
-    }
-
-    public void setUserID(int userID) {
-        this.userID = userID;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
         this.role = role;
     }
+
+    // Order matches every caller: new User(name, phNo, email, "Student")
+    public User(String userName, String phNo, String email, String role) {
+        this(0, userName, phNo, email, role);
+    }
+
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
+
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
+
+    public String getPhNo() { return phNo; }
+    public void setPhNo(String phNo) { this.phNo = phNo; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
 }

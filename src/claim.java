@@ -1,52 +1,29 @@
-public class claim {
-    int claimId;
-    String proof;
-    int claimedBy;
-    String itemName;
-    String Location ;
-    String Status;
+public class Claim {
+    private int claimId;
+    private String proof;
+    private int claimedBy;
+    private String itemName;
+    private String location;
+    private String status;
 
-    public claim(int claimId, String proof, int claimedBy, String itemName, String location, String status) {
+    public Claim(int claimId, String proof, int claimedBy, String itemName, String location, String status) {
         this.claimId = claimId;
         this.proof = proof;
         this.claimedBy = claimedBy;
         this.itemName = itemName;
-        Location = location;
-        Status = status;
-    }
-    public claim( String proof, int claimedBy, String itemName, String location, String status) {
-        this.proof = proof;
-        this.claimedBy = claimedBy;
-        this.itemName = itemName;
-        Location = location;
-        Status = status;
+        this.location = location;
+        this.status = status;
     }
 
-    public int getClaimId() {
-        return claimId;
+    public Claim(String proof, int claimedBy, String itemName, String location, String status) {
+        this(0, proof, claimedBy, itemName, location, status);
     }
 
-    public String getProof() {
-        return proof;
-    }
-
-    public int getClaimedBy() {
-        return claimedBy;
-    }
-
-    public String getItemName() {
-        return itemName;
-    }
-
-    public String getLocation() {
-        return Location;
-    }
-
-    public String getStatus() {
-        return Status;
-    }
-
-    public void setStatus(String status) {
-        Status = status;
-    }
+    public int getClaimId() { return claimId; }
+    public String getProof() { return proof; }
+    public int getClaimedBy() { return claimedBy; }
+    public String getItemName() { return itemName; }
+    public String getLocation() { return location; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

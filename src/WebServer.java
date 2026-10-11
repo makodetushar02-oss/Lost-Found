@@ -25,7 +25,7 @@ import java.util.Map;
 public class WebServer {
     private static final int PORT = 8080;
     // Same admin password as the console version. Move it out of the code later.
-    private static final String ADMIN_PASSWORD = "M@kode(02)";
+    private static final String ADMIN_PASSWORD = System.getenv("LF_ADMIN_PASSWORD") != null ? System.getenv("LF_ADMIN_PASSWORD") : "Tushar@123";
     private static final DAO dao = new DAO();
 
     public static void main(String[] args) throws IOException {

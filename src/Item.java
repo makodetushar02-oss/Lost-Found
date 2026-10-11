@@ -1,86 +1,58 @@
-abstract class Item {
-    protected int ItemId;
-    String ItemName;
-    String ItemDescription;
-    String color;
-    String category;
-    String Location;
-    int userId;
-    public Item(int itemId, String itemName, String itemDescription, String color, String category, String Location ,int userId) {
-        this.ItemId = itemId;
-        this.ItemName = itemName;
-        this.ItemDescription = itemDescription;
+public abstract class Item {
+    protected int itemId;
+    protected String itemName;
+    protected String description;
+    protected String color;
+    protected String category;
+    protected int userId;
+    protected String location;
+
+    // Used when reading from the database (id already known).
+    public Item(int itemId, String itemName, String description, String color,
+                String category, int userId, String location) {
+        this.itemId = itemId;
+        this.itemName = itemName;
+        this.description = description;
         this.color = color;
         this.category = category;
-        this.Location = Location;
         this.userId = userId;
-    }
-    public Item( String itemName, String itemDescription, String color, String category,String Location, int userId) {
-        this.ItemName = itemName;
-        this.ItemDescription = itemDescription;
-        this.color = color;
-        this.category = category;
-        this.Location = Location;
-        this.userId = userId;
+        this.location = location;
     }
 
-    public int getItemId() {
-        return ItemId;
+    // Used when creating a new item (database generates the id).
+    public Item(String itemName, String description, String color,
+                String category, int userId, String location) {
+        this(0, itemName, description, color, category, userId, location);
     }
 
-    public void setItemId(int itemId) {
-        ItemId = itemId;
-    }
+    public int getItemId() { return itemId; }
+    public void setItemId(int itemId) { this.itemId = itemId; }
 
-    public String getItemName() {
-        return ItemName;
-    }
+    public String getItemName() { return itemName; }
+    public void setItemName(String itemName) { this.itemName = itemName; }
 
-    public void setItemName(String itemName) {
-        ItemName = itemName;
-    }
+    // DAO and WebServer call getDes(); getItemDescription() kept as an alias.
+    public String getDes() { return description; }
+    public String getItemDescription() { return description; }
+    public void setItemDescription(String description) { this.description = description; }
 
-    public String getItemDescription() {
-        return ItemDescription;
-    }
+    public String getColor() { return color; }
+    public void setColor(String color) { this.color = color; }
 
-    public void setItemDescription(String itemDescription) {
-        ItemDescription = itemDescription;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public String getColor() {
-        return color;
-    }
+    public int getUserId() { return userId; }
+    public void setUserId(int userId) { this.userId = userId; }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getLocation() {
-        return Location;
-    }
-
-    public void setLocation(String location) {
-        Location = location;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
+    // Must return "LOST_ITEM" or "FOUND_ITEM" (matches the ENUM in schema.sql).
     public abstract String getType();
-    public abstract void getDescription();
 
+    public void printDetails() {
+        System.out.println(itemId + " || " + itemName + " || " + description + " || " + color
+                + " || " + category + " || user " + userId + " || " + location);
+    }
 }
